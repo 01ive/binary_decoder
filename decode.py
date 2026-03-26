@@ -84,7 +84,7 @@ def get_ffi_from_header(header_path):
 def debug_offsets(ffi):
     print(f"{'Champ':<15} | {'Offset Python':<15}")
     print("-" * 35)
-    for field in ["data_6", "data_7", "data_8", "data_9", "data_10", "data_11", "data_12"]:
+    for field in ["data_1", "data_2", "data_3", "data_4", "data_5", "data_6", "data_7"]:
         off = ffi.offsetof("MainMessage", field)
         print(f"{field:<15} | {off:<15}")
 
@@ -102,13 +102,13 @@ def run_decoder():
 
     print("--- Analyse des Champs de Bits ---")
     # L'accès est totalement transparent
-    print(f"Active  : {msg.data_8.active}")
-    print(f"Version : {msg.data_8.version}")
-    print(f"Command : {msg.data_8.command}")
+    print(f"Active  : {msg.data_3.active}")
+    print(f"Version : {msg.data_3.version}")
+    print(f"Command : {msg.data_3.command}")
     
     print("\n--- Reste du message ---")
-    print(f"ID (data_6) : {hex(msg.data_6)}")
-    print(f"Texte       : {ffi.string(msg.data_11).decode()}")
+    print(f"ID (data_6) : {hex(msg.data_1)}")
+    print(f"Texte       : {ffi.string(msg.data_6).decode()}")
 
     debug_offsets(ffi)
 

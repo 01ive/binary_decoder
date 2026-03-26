@@ -22,24 +22,24 @@ typedef enum {
 } EnumMode;
 
 typedef struct {
-    uint16_t data_1;
-    float data_2;
+    uint16_t data_41;
+    float data_42;
 } SubStructure;
 
 typedef struct {
-    uint8_t data_3;
-    EnumMode data_4;
-    double data_5;
+    uint8_t data_51;
+    EnumMode data_52;
+    double data_53;
 } NestedStructure;
 
 typedef struct {
-    uint32_t data_6;
-    EnumStatus data_7;
-    ControlBits data_8;       // Nouveau champ : 1 octet de bits
-    SubStructure data_9;
-    NestedStructure data_10;
-    char data_11[16];
-    int64_t data_12;
+    uint32_t data_1;
+    EnumStatus data_2;
+    ControlBits data_3;       // Nouveau champ : 1 octet de bits
+    SubStructure data_4;
+    NestedStructure data_5;
+    char data_6[16];
+    int64_t data_7;
 } MainMessage;
 
 #pragma pack(pop)
