@@ -1,45 +1,34 @@
 #include <stdio.h>
-#include <stdint.h>
 #include <string.h>
-
+#include <stddef.h>
 #include "protocol.h"
 
-// On utilise l'attribut packed pour s'assurer que le compilateur ne rajoute pas
-// d'octets invisibles (padding) entre les champs, facilitant le décodage futur.
-#define PACKED __attribute__((packed))
-
 int main() {
-    // 1. Initialisation des données
     MainMessage msg;
-    memset(&msg, 0, sizeof(MainMessage)); // Nettoyage de la mémoire
+    memset(&msg, 0, sizeof(MainMessage));
 
-    msg.data_6 = 0xDEADBEEF;
+    msg.data_6 = 0xABCDE000;
     msg.data_7 = STATUS_ACTIVE;
+
+    // Initialisation des champs de bits
+    msg.data_8.active = 1;      // True
+    msg.data_8.version = 5;     // 101 en binaire
+    msg.data_8.command = 12;    // 1100 en binaire
+
+    msg.data_9.data_1 = 2024;
+    msg.data_9.data_2 = 1.23f;
     
-    msg.data_8.data_1 = 1024;
-    msg.data_8.data_2 = 3.14159f;
+    // ... remplissage du reste identique au précédent ...
+    strncpy(msg.data_11, "Bitfield Test", sizeof(msg.data_11));
 
-    msg.data_9.data_3 = 42;
-    msg.data_9.data_4 = MODE_SLOW;
-    msg.data_9.data_5 = 123.456789;
-
-    strncpy(msg.data_10, "Hello Proto", sizeof(msg.data_10));
-    msg.data_11 = -9223372036854775807LL; // Valeur min int64 environ
-
-    // 2. Écriture dans un fichier binaire
     FILE *file = fopen("message_data.bin", "wb");
-    if (file == NULL) {
-        perror("Erreur lors de l'ouverture du fichier");
-        return 1;
-    }
-
-    size_t written = fwrite(&msg, sizeof(MainMessage), 1, file);
-    
-    if (written == 1) {
-        printf("Binaire genere avec succes !\n");
-        printf("Taille totale du message : %zu octets\n", sizeof(MainMessage));
-    }
-
+    fwrite(&msg, sizeof(MainMessage), 1, file);
     fclose(file);
+
+    printf("Binaire généré (Taille : %zu octets)\n", sizeof(MainMessage));
+    printf("%zu\n", sizeof(msg));
+
+    printf("data_11 est à l'offset : %zu\n", offsetof(MainMessage, data_11));
+
     return 0;
 }
