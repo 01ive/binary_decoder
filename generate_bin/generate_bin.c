@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stddef.h>
+#include <stdint.h>
 #include "protocol.h"
 
 int main() {

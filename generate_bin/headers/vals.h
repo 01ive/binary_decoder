@@ -1,0 +1,1 @@
+#define C_STRING_SIZE 16
