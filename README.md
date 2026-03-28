@@ -9,51 +9,72 @@ A robust prototype demonstrating how to share "single source of truth" C headers
 * **Memory Alignment**: Handles C structure packing (`#pragma pack(1)`) to ensure byte-perfect synchronization between languages.
 * **JSON Export**: Automatically converts decoded binary messages into structured JSON format via recursive introspection.
 * **Multi-Header Support**: Uses the system's C preprocessor to resolve `#include` dependencies across multiple files.
+* **PCAPNG Decoding**: Reads and decodes binary payloads from PCAPNG capture files, filtering for UDP packets.
+* **Binary Sending**: Includes tools to send generated binary data over UDP for testing and simulation.
 
 ## 📂 Project Structure
 
 ```text
 .
-├── generate_bin.c        # C producer: Creates the binary sample
-├── Makefile              # Build system for the C project
-├── decode.py             # Python consumer: Decodes binary to JSON
-├── generate_bin/         # Directory for generated artifacts
-│   └── headers/          # C Header files (The "Source of Truth")
-│       ├── protocol.h    # Main entry point
-│       ├── enums.h       # Status and Mode definitions
-│       ├── formats.h     # Bit-fields and Nested structures
-│       └── vals.h        # Constants and Macros
-└── message_data.bin      # The generated binary (output of C)
+├── bin_tools/
+│   ├── generate_bin.c        # C producer: Creates the binary sample
+│   ├── send_bin.c            # C sender: Sends binary data over UDP
+│   ├── Makefile              # Build system for the C tools
+│   ├── generate_bin          # Compiled executable (generated)
+│   ├── send_bin              # Compiled executable (generated)
+│   └── message_data.bin      # The generated binary (output of generate_bin)
+├── headers/
+│   ├── protocol.h            # Main entry point
+│   ├── enums.h               # Status and Mode definitions
+│   ├── formats.h             # Bit-fields and Nested structures
+│   └── vals.h                # Constants and Macros
+├── decode.py                 # Python consumer: Decodes binary to JSON and from PCAPNG
+├── capture.pcapng            # Sample PCAPNG capture file
+├── message.json              # Decoded JSON output
+├── requirements.txt          # Python dependencies
+├── LICENSE
+└── README.md
 ```
 
 ## 🛠 Prerequisites
 
 * **C Compiler**: `gcc` (used for both compilation and header pre-processing).
 * **Python 3.10+**
-* **CFFI Library**: 
+* **Dependencies**: 
     ```bash
-    pip install cffi
+    pip install -r requirements.txt
     ```
+    This installs CFFI, pycparser, and scapy for PCAPNG handling.
 
 ## 🚦 How to Use
 
-### 1. Generate the Binary Data
-Compile and run the C producer using the provided Makefile:
+### 1. Build the C Tools
+Navigate to the bin_tools directory and compile the binaries:
 ```bash
+cd bin_tools
 make all
 ```
-This will create the `generate_bin` executable and produce a `message_data.bin` file containing a serialized `MainMessage` structure.
+This will create the `generate_bin` and `send_bin` executables and generate `message_data.bin`.
 
-### 2. Decode in Python
-Run the decoder script:
+### 2. Decode the Binary Data in Python
+Run the decoder script from the project root:
 ```bash
 python decode.py
 ```
 The script will:
-1. Invoke `gcc -E` to flatten the C headers.
-2. Map the `message_data.bin` file onto the C structure.
+1. Preprocess the C headers using GCC.
+2. Decode the `bin_tools/message_data.bin` file.
 3. Print the decoded fields to the console.
 4. Generate a `message.json` file.
+5. Read and decode UDP payloads from `capture.pcapng`.
+
+### 3. Send Binary Data (Optional)
+To send the generated binary over UDP for testing:
+```bash
+cd bin_tools
+make send
+```
+This sends `message_data.bin` to localhost:8080.
 
 ## 🧠 Technical Highlights
 
