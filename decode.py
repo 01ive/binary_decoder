@@ -78,8 +78,8 @@ def export_to_json(msg, ffi):
 
 def run_decoder():
     # Chemin vers ton header principal
-    header_path = "generate_bin/headers/protocol.h"
-    bin_path = "generate_bin/message_data.bin"
+    header_path = "bin_tools/headers/protocol.h"
+    bin_path = "bin_tools/message_data.bin"
 
     ffi = get_ffi_with_preprocess(header_path)
     

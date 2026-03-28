@@ -4,3 +4,7 @@ venv
 __pycache__
 .vscode
 generate_bin/generate_bin
+*.pcapng
+*.json
+bin_tools/generate_bin
+bin_tools/send_bin
