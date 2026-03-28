@@ -3,6 +3,7 @@ import json
 import re
 import subprocess
 from cffi import FFI
+import scapy.all as scapy
 
 def struct_to_dict(ffi, obj):
     """ Convertit récursivement une structure CFFI en dictionnaire Python. """
@@ -76,21 +77,12 @@ def export_to_json(msg, ffi):
         f.write(json_output)
     print("\n--- Message exporté dans message.json ---")
 
-def run_decoder():
-    # Chemin vers ton header principal
-    header_path = "bin_tools/headers/protocol.h"
-    bin_path = "bin_tools/message_data.bin"
-
-    ffi = get_ffi_with_preprocess(header_path)
-    
-    if not os.path.exists(bin_path):
-        print(f"Erreur : {bin_path} introuvable. Lance 'make all' d'abord.")
-        return
-
-    with open(bin_path, "rb") as f:
-        blob = f.read()
+def run_decoder(header_path, blob):
+    ffi = get_ffi_with_preprocess(header_path)   
 
     msg = ffi.cast("MainMessage *", ffi.from_buffer(blob))
+
+    export_to_json(msg, ffi)
 
     print(f"Taille du message détectée : {ffi.sizeof(msg[0])} octets")
     
@@ -105,7 +97,24 @@ def run_decoder():
     print(f"Texte (data_6)  : {ffi.string(msg.data_6).decode('utf-8')}")
     print(f"Valeur (data_7) : {hex(msg.data_7)}")
 
-    export_to_json(msg, ffi)
+def read_pcapng(file_path):
+    packets = scapy.rdpcap(file_path)
+    for pkt in packets:
+        if pkt.haslayer(scapy.UDP) and not pkt.haslayer(scapy.DNS):
+            print(f"Packet UDP : {pkt.summary()}")
+            blob = pkt.load
+            run_decoder("bin_tools/headers/protocol.h", blob)
 
 if __name__ == "__main__":
-    run_decoder()
+    # Chemin vers ton header principal
+    header_path = "bin_tools/headers/protocol.h"
+    bin_path = "bin_tools/message_data.bin"
+
+    if not os.path.exists(bin_path):
+        print(f"Erreur : {bin_path} introuvable. Lance 'make all' d'abord.")
+        exit(1)
+    with open(bin_path, "rb") as f:
+        blob = f.read()
+
+    run_decoder(header_path, blob)
+    read_pcapng("capture.pcapng")
