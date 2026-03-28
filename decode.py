@@ -77,13 +77,13 @@ class DecoderH(FFI):
 
         return obj
     
-    def export_to_json(self, msg):
+    def export_to_json(self, msg, json_path="message.json"):
         """ Export the decoded message to a JSON file for easier analysis and visualization. """
         data_dict = self._struct_to_dict(msg)
         json_output = json.dumps(data_dict, indent=4)
-        with open("message.json", "w") as f:
+        with open(json_path, "w") as f:
             f.write(json_output)
-        logging.info("Message exported to message.json")
+        logging.info(f"Message exported to {json_path}")
 
 def print_decoded_data(ffi, msg):
     """ Print the decoded data in a human-readable format, including field values and bitfield analysis. """
@@ -108,6 +108,7 @@ def read_pcapng(ffi, file_path):
             logging.debug(f"Packet UDP : {pkt.summary()}")
             blob = pkt.load
             msg = ffi.cast("MainMessage *", ffi.from_buffer(blob))
+            ffi.export_to_json(msg, json_path=f"packet_{pkt.time}.json")
             print_decoded_data(ffi, msg)
 
 
